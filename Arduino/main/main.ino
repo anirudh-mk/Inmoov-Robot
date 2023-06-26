@@ -3,8 +3,9 @@ int xpos=90;
 int ypos=90;
 int sel = 0;
 int inc =5;
-Servo servoX;
-Servo servoY;
+Servo servo1;
+Servo servo2;
+Servo servo3;
 //int pwmpin=6;
 int i=0;
 //int ledv=0;
@@ -13,16 +14,16 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.setTimeout(1);
-  servoX.attach(9);
-  servoY.attach(11);
+  servo1.attach(9);
+  servo2.attach(10);
+  servo3.attach(11);
   //pinMode(pwmpin, OUTPUT);
   //pinMode(13, OUTPUT);
  // digitalWrite(13, HIGH);
  
-  servoX.write(90);
-  servoY.write(90);
-  
-
+  servo1.write(90);
+  servo2.write(90);
+  servo3.write(90);
 }
 
 void loop() {
@@ -31,22 +32,28 @@ void loop() {
     sel=Serial.parseInt();
     Serial.print(sel);
     if(sel==6){
-      xpos= xpos+inc;
-      servoX.write(xpos);
-      
-
+      xpos= xpos-inc;
+      servo1.write(xpos);
+      servo2.write(xpos);
+      servo3.write(xpos);
   }
   if(sel==4){
-    xpos=xpos -inc;
-    servoX.write(xpos);
+    xpos = xpos+inc;
+    servo1.write(xpos);
+    servo2.write(xpos);
+    servo3.write(xpos);
   }
   if(sel==8){
-    ypos=ypos -inc;
-    servoY.write(ypos);
+    ypos= ypos + inc;
+    servo1.write(ypos);
+    servo2.write(xpos);
+    servo3.write(xpos);
   }
   if(sel==2){
-    ypos=ypos+inc;
-    servoY.write(ypos);
+    ypos= ypos - inc;
+    servo1.write(ypos);
+    servo2.write(xpos);
+    servo3.write(xpos);
   }
   
   

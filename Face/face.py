@@ -80,7 +80,6 @@ while True:
 
                 # SERIAL_COMMUNICATION.write(SerialCommunication.FACE_DETECTED.value.encode())
                 # print(SERIAL_COMMUNICATION.readline())
-
     cv2.imshow('img', flipped_image)
 
     k = cv2.waitKey(30) & 0xff

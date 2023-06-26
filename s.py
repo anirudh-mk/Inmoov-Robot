@@ -1,11 +1,55 @@
 import cv2
 import serial
 from Utils.utils import ImaginaryBox, CascadeClassifier, Video, Color, Arduino, SerialCommunication
-# import threading
-# from Voice.Voice import run_conversation
+import threading
+
+import openai
+import pyttsx3
+import speech_recognition as sr
+
+openai.api_key = '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'
+
+engine = pyttsx3.init()
+
+r = sr.Recognizer()
+mic = sr.Microphone(device_index=1)
+
+
+def run_conversation():
+    conversation = ""
+    user_name = "You"
+    bot_name = "San"
+
+    while True:
+        with mic as source:
+            print("\nlistening...")
+            r.adjust_for_ambient_noise(source, duration=0.2)
+            audio = r.listen(source)
+        print("no longer listening.\n")
+
+        try:
+            user_input = r.recognize_google(audio)
+        except:
+            continue
+
+        prompt = user_name + ": " + user_input + "\n" + bot_name+ ": "
+
+        conversation += prompt  # allows for context
+
+        # fetch response from open AI api
+        response = openai.Completion.create(engine='text-davinci-003', prompt=conversation, max_tokens=100)
+        response_str = response["choices"][0]["text"].replace("\n", "")
+        response_str = response_str.split(user_name + ": ", 1)[0].split(bot_name + ": ", 1)[0]
+
+        conversation += response_str + "\n"
+        print(response_str)
+
+        engine.say(response_str)
+        engine.runAndWait()
+
 
 FACE_CASCADE = cv2.CascadeClassifier(CascadeClassifier.FRONT_FACE.value)
-SERIAL_COMMUNICATION = serial.Serial(port=Arduino.PORT.value, baudrate=Arduino.BAUD_RATE.value, write_timeout=1)
+# SERIAL_COMMUNICATION = serial.Serial(port=Arduino.PORT.value, baudrate=Arduino.BAUD_RATE.value, write_timeout=1)
 
 capture = cv2.VideoCapture(Video.CAMERA.value)
 
@@ -36,7 +80,7 @@ while True:
         if width1 > Video.FACE_TRACKING_WIDTH.value:
 
             if circle_x < (ImaginaryBox.X_COORDINATE.value + 60):
-                SERIAL_COMMUNICATION.write(SerialCommunication.LEFT.value.encode())
+                # SERIAL_COMMUNICATION.write(SerialCommunication.LEFT.value.encode())
                 cv2.putText(flipped_image, f'LEFT {SerialCommunication.LEFT.value}', (30, 30), cv2.FONT_HERSHEY_SIMPLEX,
                             1,
                             Color.GREEN.value, 2)
@@ -44,7 +88,7 @@ while True:
                 break
 
             if circle_x > (ImaginaryBox.X_COORDINATE.value + 120):
-                SERIAL_COMMUNICATION.write(SerialCommunication.RIGHT.value.encode())
+                # SERIAL_COMMUNICATION.write(SerialCommunication.RIGHT.value.encode())
                 cv2.putText(flipped_image, f'RIGHT {SerialCommunication.RIGHT.value}', (30, 30),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             1, Color.GREEN.value, 2)
@@ -52,14 +96,14 @@ while True:
                 break
 
             if circle_y < (ImaginaryBox.Y_COORDINATE.value + 60):
-                SERIAL_COMMUNICATION.write(SerialCommunication.UP.value.encode())
+                # SERIAL_COMMUNICATION.write(SerialCommunication.UP.value.encode())
                 cv2.putText(flipped_image, f'UP {SerialCommunication.UP.value}', (30, 30), cv2.FONT_HERSHEY_SIMPLEX,
                             1, Color.GREEN.value, 2)
                 print("up", SerialCommunication.UP.value)
                 break
 
             if circle_y > (ImaginaryBox.Y_COORDINATE.value + 120):
-                SERIAL_COMMUNICATION.write(SerialCommunication.DOWN.value.encode())
+                # SERIAL_COMMUNICATION.write(SerialCommunication.DOWN.value.encode())
                 cv2.putText(flipped_image, f'DOWN {SerialCommunication.DOWN.value}', (30, 30), cv2.FONT_HERSHEY_SIMPLEX,
                             1, Color.GREEN.value, 2)
                 print("down", SerialCommunication.DOWN.value)
@@ -76,11 +120,10 @@ while True:
                 cv2.putText(flipped_image, f'FACE TRACKED', (30, 30), cv2.FONT_HERSHEY_SIMPLEX,
                             1,
                             Color.GREEN.value, 2)
-                # threading.Thread(target=run_conversation).start()
+                threading.Thread(target=run_conversation).start()
 
                 # SERIAL_COMMUNICATION.write(SerialCommunication.FACE_DETECTED.value.encode())
                 # print(SERIAL_COMMUNICATION.readline())
-
     cv2.imshow('img', flipped_image)
 
     k = cv2.waitKey(30) & 0xff

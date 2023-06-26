@@ -24,13 +24,13 @@ class Color(Enum):
 
 
 class SerialCommunication(Enum):
-    LEFT = 'A'
-    RIGHT = 'D'
-    UP = 'W'
-    DOWN = 'S'
-    FACE_DETECTED = 'Y'
+    LEFT = '4'
+    RIGHT = '6'
+    UP = '2'
+    DOWN = '8'
+    FACE_DETECTED = '5'
 
 
 class Arduino(Enum):
-    PORT = 'COM3'
+    PORT = 'COM4'
     BAUD_RATE = 9600
